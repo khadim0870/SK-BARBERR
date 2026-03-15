@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK BARBER - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-body">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-cut"></i>
+                <span>SK <span class="highlight">BARBER</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Retour site</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="auth" class="auth-section">
+            <h2 class="section-title">Accès <span class="highlight">Admin</span></h2>
+
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h3 class="auth-title">Connexion</h3>
+                    <p class="auth-hint">Identifiants admin définis dans `server/.env`.</p>
+                    <form id="adminLoginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="adminEmail">Email *</label>
+                            <input id="adminEmail" type="email" autocomplete="username" required
+                                placeholder="admin@skbarber.local">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Mot de passe *</label>
+                            <input id="adminPassword" type="password" autocomplete="current-password" required
+                                placeholder="Mot de passe admin">
+                        </div>
+                        <button class="btn-submit" type="submit">
+                            <i class="fas fa-right-to-bracket"></i>
+                            Se connecter
+                        </button>
+                    </form>
+
+                    <div id="authMessage" class="message"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin" class="admin-section" style="display: none;">
+            <h2 class="section-title">Dashboard <span class="highlight">Admin</span></h2>
+
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <i class="fas fa-calendar-day"></i>
+                    <h3 id="todayCount">0</h3>
+                    <p>RDV aujourd'hui</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3 id="pendingCount">0</h3>
+                    <p>En attente</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <h3 id="totalClients">0</h3>
+                    <p>Clients total</p>
+                </div>
+            </div>
+
+            <div class="admin-controls">
+                <button id="refreshBtn" class="btn-secondary" type="button">
+                    <i class="fas fa-sync"></i> Actualiser
+                </button>
+                <button id="logoutBtn" class="btn-secondary" type="button">
+                    <i class="fas fa-right-from-bracket"></i> Déconnexion
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Barbier</th>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsList">
+                        <!-- Les réservations seront chargées ici -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

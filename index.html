@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK BARBER - Réservations</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-cut"></i>
+                <span>SK <span class="highlight">BARBER</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#accueil" class="active">Accueil</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#barbers">Barbiers</a></li>
+                <li><a href="#reservation" class="btn-reservation">Réserver</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="accueil" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="animate-text">Le Style <span class="highlight">Authentique</span></h1>
+                <p class="animate-text-delay">Découvrez l'excellence du barbier traditionnel avec une touche moderne</p>
+                <a href="#reservation" class="btn-primary">Réserver maintenant</a>
+            </div>
+            <div class="hero-visual">
+                <img class="hero-photo" src="assets/image/image.png" alt="Portrait">
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <h2 class="section-title">Nos <span class="highlight">Services</span></h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-cut"></i>
+                <h3>Coupe Classique</h3>
+                <p>Coupe traditionnelle aux ciseaux</p>
+                <p class="price">25€</p>
+                <span class="duration">30 min</span>
+                <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe Classique">Réserver</a>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-razor"></i>
+                <h3>Coupe + Barbe</h3>
+                <p>Coupe et taille de barbe complète</p>
+                <p class="price">35€</p>
+                <span class="duration">45 min</span>
+                <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + Barbe">Réserver</a>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-spa"></i>
+                <h3>Soin Visage</h3>
+                <p>Nettoyage et soin profond</p>
+                <p class="price">25€</p>
+                <span class="duration">30 min</span>
+                <a href="#reservation" class="btn-secondary btn-service" data-service="Soin Visage">Réserver</a>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-crown"></i>
+                <h3>Pack Prestige</h3>
+                <p>Coupe, barbe et soin complet</p>
+                <p class="price">50€</p>
+                <span class="duration">60 min</span>
+                <a href="#reservation" class="btn-secondary btn-service" data-service="Pack Prestige">Réserver</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barbers Section -->
+    <section id="barbers" class="barbers">
+        <h2 class="section-title">Nos <span class="highlight">Barbiers</span></h2>
+            <div class="barbers-grid">
+                <div class="barber-card">
+                <img src="assets/image/image.png" alt="Ahmed">
+                <h3>Ahmed</h3>
+                <p>Maître barbier - 10 ans d'expérience</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            <div class="barber-card">
+                <img src="assets/image/image.png" alt="Karim">
+                <h3>Karim</h3>
+                <p>Spécialiste coupes modernes</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+            <div class="barber-card">
+                <img src="assets/image/image.png" alt="Youssef">
+                <h3>Youssef</h3>
+                <p>Expert en tailles de barbe</p>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation Section -->
+    <section id="reservation" class="reservation">
+        <h2 class="section-title">Réserver <span class="highlight">Maintenant</span></h2>
+        <div class="reservation-container">
+            <div class="reservation-info">
+                <div class="account-card" id="clientAccount">
+                    <h3>Compte client</h3>
+
+                    <div id="clientLoggedOut">
+                        <p class="account-hint">Simple : si l'email existe déjà, ça connecte. Sinon ça crée le compte.</p>
+
+                        <form id="clientAuthForm" class="account-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="clientFirstName">Prénom *</label>
+                                    <input type="text" id="clientFirstName" required placeholder="Prénom">
+                                </div>
+                                <div class="form-group">
+                                    <label for="clientLastName">Nom *</label>
+                                    <input type="text" id="clientLastName" required placeholder="Nom">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="clientPhone">Numéro de téléphone *</label>
+                                <input type="tel" id="clientPhone" required placeholder="06 12 34 56 78">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="clientEmail">Email *</label>
+                                <input type="email" id="clientEmail" required placeholder="votre@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="clientPassword">Mot de passe *</label>
+                                <input type="password" id="clientPassword" required placeholder="Min 6 caractères">
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-user-check"></i>
+                                Continuer
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="clientLoggedIn" style="display: none;">
+                        <p class="account-hint">
+                            Connecté en tant que <strong id="clientWho"></strong>
+                        </p>
+                        <div class="account-actions">
+                            <button type="button" class="btn-secondary" id="clientLogoutBtn">
+                                <i class="fas fa-right-from-bracket"></i> Déconnexion
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="clientAuthMessage" class="message"></div>
+                </div>
+
+                <h3>Informations</h3>
+                <p><i class="fas fa-user"></i> Professionnel, passionnel</p>
+                <p><i class="fab fa-instagram"></i> @aumanoirdescheuveux</p>
+                <p><i class="fab fa-instagram"></i> sk_barberrr</p>
+                <p><i class="fab fa-instagram"></i> sk__barberr</p>
+                <p><i class="fas fa-map-marker-alt"></i> Ngor Almadies, à côté de la graine d'or</p>
+                <p><i class="fas fa-phone"></i> Tel et Wtsp: 764077543</p>
+                <p><i class="fas fa-clock"></i> Lun-Sam: 9h - 20h</p>
+                <div class="availability">
+                    <h4>Prochaines disponibilités</h4>
+                    <div class="time-slots" id="timeSlots">
+                        <!-- Les créneaux seront chargés ici -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="bookingLocked" class="booking-locked" style="display: none;">
+                <h3>Réservation</h3>
+                <p>Crée un compte / connecte-toi pour réserver.</p>
+                <a href="#reservation" class="btn-primary">Je me connecte</a>
+            </div>
+
+            <form id="bookingForm" class="booking-form" style="display: none;">
+                <div class="form-group">
+                    <label for="name">Nom complet *</label>
+                    <input type="text" id="name" required placeholder="Votre nom">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required placeholder="votre@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Téléphone *</label>
+                    <input type="tel" id="phone" required placeholder="06 12 34 56 78">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="service">Service *</label>
+                        <select id="service" required>
+                            <option value="">Choisir un service</option>
+                            <option value="Coupe Classique">Coupe Classique - 25€</option>
+                            <option value="Coupe + Barbe">Coupe + Barbe - 35€</option>
+                            <option value="Soin Visage">Soin Visage - 25€</option>
+                            <option value="Pack Prestige">Pack Prestige - 50€</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="barber">Barbier *</label>
+                        <select id="barber" required>
+                            <option value="">Choisir un barbier</option>
+                            <option value="Ahmed">Ahmed</option>
+                            <option value="Karim">Karim</option>
+                            <option value="Youssef">Youssef</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Heure *</label>
+                        <select id="time" required>
+                            <option value="">Choisir une heure</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes supplémentaires</label>
+                    <textarea id="notes" rows="3" placeholder="Précisions particulières..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-calendar-check"></i>
+                    Confirmer ma réservation
+                </button>
+
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+    </section>
+
+    <section id="myBookings" class="my-bookings" style="display: none;">
+        <h2 class="section-title">Mes <span class="highlight">Réservations</span></h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Barbier</th>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="myBookingsList">
+                    <!-- Mes réservations -->
+                </tbody>
+            </table>
+        </div>
+        <div class="my-bookings-actions">
+            <button type="button" class="btn-secondary" id="myBookingsRefresh">
+                <i class="fas fa-rotate"></i> Actualiser
+            </button>
+        </div>
+        <div id="myBookingsMessage" class="message"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>SK BARBER</h3>
+                <p>Votre style, notre passion. Au service de votre élégance depuis 2010.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Horaires</h3>
+                <p>Lundi - Vendredi: 9h - 20h</p>
+                <p>Samedi: 10h - 19h</p>
+                <p>Dimanche: Fermé</p>
+            </div>
+            <div class="footer-section">
+                <h3>Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 SK BARBER. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
