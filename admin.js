@@ -12,6 +12,10 @@
   const refreshBtn = document.querySelector("#refreshBtn");
   const logoutBtn = document.querySelector("#logoutBtn");
 
+  const heroVideoSelect = document.querySelector("#heroVideoSelect");
+  const heroVideoSave = document.querySelector("#heroVideoSave");
+  const heroVideoStatus = document.querySelector("#heroVideoStatus");
+
   const bookingsListEl = document.querySelector("#bookingsList");
   const todayCountEl = document.querySelector("#todayCount");
   const pendingCountEl = document.querySelector("#pendingCount");
@@ -29,6 +33,13 @@
     authMessage.className = "message";
     if (type) authMessage.classList.add(type);
     authMessage.textContent = text || "";
+  };
+
+  const setHeroStatus = (type, text) => {
+    if (!heroVideoStatus) return;
+    heroVideoStatus.className = "message";
+    if (type) heroVideoStatus.classList.add(type);
+    heroVideoStatus.textContent = text || "";
   };
 
   const getToken = () => sessionStorage.getItem(ADMIN_TOKEN_KEY) || "";
@@ -191,6 +202,38 @@
     renderAdmin(data.bookings || []);
   };
 
+  const loadHeroVideoOptions = async () => {
+    if (!heroVideoSelect) return;
+    const manifest = await apiFetch("/assets/videos/manifest.json");
+    const items = Array.isArray(manifest) ? manifest : [];
+
+    heroVideoSelect.innerHTML = "";
+    for (const item of items) {
+      const src = typeof item === "string" ? item : String(item?.src || "");
+      const caption = typeof item === "string" ? "" : String(item?.caption || "");
+      if (!src) continue;
+      const opt = document.createElement("option");
+      opt.value = src;
+      opt.textContent = caption ? `${caption} — ${src}` : src;
+      heroVideoSelect.appendChild(opt);
+    }
+  };
+
+  const loadCurrentHeroVideo = async () => {
+    if (!heroVideoSelect) return;
+    const data = await apiFetch("/api/public/settings");
+    const src = String(data?.heroVideoSrc || "").trim();
+    if (!src) return;
+    heroVideoSelect.value = src;
+  };
+
+  const saveHeroVideo = async () => {
+    if (!heroVideoSelect) return;
+    const src = String(heroVideoSelect.value || "").trim();
+    if (!src) return;
+    await apiFetch("/api/admin/settings/hero-video", { method: "PATCH", body: { src } });
+  };
+
   const login = async (email, password) => {
     const data = await apiFetch("/api/admin/login", { method: "POST", body: { email, password } });
     setToken(data.token);
@@ -224,6 +267,9 @@
       try {
         await login(email, password);
         showAdmin();
+        setHeroStatus("", "");
+        await loadHeroVideoOptions();
+        await loadCurrentHeroVideo();
         await loadBookings();
       } catch (err) {
         if (err?.network) {
@@ -245,12 +291,27 @@
     if (getToken()) {
       try {
         showAdmin();
+        setHeroStatus("", "");
+        await loadHeroVideoOptions();
+        await loadCurrentHeroVideo();
         await loadBookings();
       } catch {
         clearToken();
         showAuth();
       }
     }
+
+    heroVideoSave?.addEventListener("click", async () => {
+      setHeroStatus("", "");
+      try {
+        await saveHeroVideo();
+        setHeroStatus("success", "Vidéo d'accueil mise à jour.");
+      } catch (err) {
+        if (err?.status === 401) setHeroStatus("error", "Session expirée. Reconnecte-toi.");
+        else if (err?.status === 403) setHeroStatus("error", "Accès refusé (admin).");
+        else setHeroStatus("error", "Impossible d'enregistrer.");
+      }
+    });
   };
 
   init().catch(() => {});

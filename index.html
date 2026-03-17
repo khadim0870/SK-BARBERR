@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="fr">
+﻿<!DOCTYPE html>
+<!-- Pour revenir au style normal: retire l'attribut data-theme="premium" sur <html> -->
+<html lang="fr" data-theme="premium">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SK BARBER - Réservations</title>
+    <title>MANOIR DES CHEVEUX - Réservations</title>
     <link rel="stylesheet" href="style.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap"
@@ -17,11 +18,12 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-cut"></i>
-                <span>SK <span class="highlight">BARBER</span></span>
+                <img class="logo-img" src="assets/image/logo.jpeg" alt="MANOIR DES CHEVEUX">
+                <span>MANOIR DES <span class="highlight">CHEVEUX</span></span>
             </div>
             <ul class="nav-menu">
                 <li><a href="#accueil" class="active">Accueil</a></li>
+                <li><a href="#videos">Vidéos</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#barbers">Barbiers</a></li>
                 <li><a href="#reservation" class="btn-reservation">Réserver</a></li>
@@ -37,6 +39,8 @@
 
     <!-- Hero Section -->
     <section id="accueil" class="hero">
+        <video class="hero-bg-video" src="assets/videos/wa-014.mp4" autoplay loop muted playsinline
+            preload="metadata" poster="assets/image/video-poster.svg"></video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-text">
@@ -50,43 +54,278 @@
         </div>
     </section>
 
+    <!-- Videos Section -->
+    <section id="videos" class="videos">
+        <h2 class="section-title">NOS <span class="highlight">GALERIES</span></h2>
+        <div class="video-grid" id="videoGrid"></div>
+    <!-- <p class="video-note">
+            Pour ajouter beaucoup de vidéos : mets-les dans <code>assets/videos</code> puis ajoute-les dans
+            <code>assets/videos/manifest.json</code>.
+        </p>-->
+    </section>
+
     <!-- Services Section -->
     <section id="services" class="services">
         <h2 class="section-title">Nos <span class="highlight">Services</span></h2>
         <div class="services-grid">
-            <div class="service-card">
-                <i class="fas fa-cut"></i>
-                <h3>Coupe Classique</h3>
-                <p>Coupe traditionnelle aux ciseaux</p>
-                <p class="price">25€</p>
-                <span class="duration">30 min</span>
-                <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe Classique">Réserver</a>
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-scissors"></i>
+                    <div>
+                        <h3>Coiffure</h3>
+                        <p class="service-subtitle">Coupes & styles</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">Contours</span>
+                        <span class="service-item-price">2&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Contours">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe simple</span>
+                        <span class="service-item-price">4&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe simple">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe enfant</span>
+                        <span class="service-item-price">4&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe enfant">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Taper fade</span>
+                        <span class="service-item-price">6&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Taper fade">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Dégradé</span>
+                        <span class="service-item-price">6&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Dégradé">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe + wave</span>
+                        <span class="service-item-price">8&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + wave">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe ciseaux</span>
+                        <span class="service-item-price">10&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe ciseaux">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe dame</span>
+                        <span class="service-item-price">10&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe dame">Réserver</a>
+                    </li>
+                </ul>
             </div>
-            <div class="service-card">
-                <i class="fas fa-razor"></i>
-                <h3>Coupe + Barbe</h3>
-                <p>Coupe et taille de barbe complète</p>
-                <p class="price">35€</p>
-                <span class="duration">45 min</span>
-                <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + Barbe">Réserver</a>
+
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-right-to-bracket"></i>
+                    <div>
+                        <h3>Formules</h3>
+                        <p class="service-subtitle">Packs rapides</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">Contours + barbe complète</span>
+                        <span class="service-item-price">4&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Contours + barbe complète">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Dégradé + détox + shampoing</span>
+                        <span class="service-item-price">9&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Dégradé + détox + shampoing">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Cône + détox + shampoing</span>
+                        <span class="service-item-price">9&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Cône + détox + shampoing">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe + défrisage + shampoing</span>
+                        <span class="service-item-price">10&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + défrisage + shampoing">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe + teinture blonde</span>
+                        <span class="service-item-price">10&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + teinture blonde">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Coupe + teinture (blanc et autres)</span>
+                        <span class="service-item-price">12&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe + teinture (blanc et autres)">Réserver</a>
+                    </li>
+                </ul>
             </div>
-            <div class="service-card">
-                <i class="fas fa-spa"></i>
-                <h3>Soin Visage</h3>
-                <p>Nettoyage et soin profond</p>
-                <p class="price">25€</p>
-                <span class="duration">30 min</span>
-                <a href="#reservation" class="btn-secondary btn-service" data-service="Soin Visage">Réserver</a>
+
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-braille"></i>
+                    <div>
+                        <h3>Locks & twist</h3>
+                        <p class="service-subtitle">Départ & resserrage</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage demi-tête</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage demi-tête">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage tête complète</span>
+                        <span class="service-item-price">25&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage tête complète">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Départ de locks</span>
+                        <span class="service-item-price">50&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Départ de locks">Réserver</a>
+                    </li>
+                </ul>
             </div>
-            <div class="service-card">
-                <i class="fas fa-crown"></i>
-                <h3>Pack Prestige</h3>
-                <p>Coupe, barbe et soin complet</p>
-                <p class="price">50€</p>
-                <span class="duration">60 min</span>
-                <a href="#reservation" class="btn-secondary btn-service" data-service="Pack Prestige">Réserver</a>
+
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-fire"></i>
+                    <div>
+                        <h3>Twist / locks (tarifs)</h3>
+                        <p class="service-subtitle">Tarifs détaillés</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">Twist</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Twist">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Micro twist</span>
+                        <span class="service-item-price">25&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Micro twist">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Sister twist avec extension (à partir de)</span>
+                        <span class="service-item-price">50&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Sister twist avec extension">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Sister locks</span>
+                        <span class="service-item-price">75&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Sister locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Micro locks</span>
+                        <span class="service-item-price">95&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Micro locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Dream locks</span>
+                        <span class="service-item-price">45&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Dream locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Locks avec extension (à partir de)</span>
+                        <span class="service-item-price">150&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Locks avec extension">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Extension dread locks (à partir de)</span>
+                        <span class="service-item-price">125&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Extension dread locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage avec broderie</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage avec broderie">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage micro locks</span>
+                        <span class="service-item-price">25&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage micro locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage sister locks</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage sister locks">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage twist</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage twist">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Resserrage micro twist</span>
+                        <span class="service-item-price">20&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Resserrage micro twist">Réserver</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-spa"></i>
+                    <div>
+                        <h3>Soins</h3>
+                        <p class="service-subtitle">Bien-être</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">Manicure</span>
+                        <span class="service-item-price">7&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Manicure">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Pédicure</span>
+                        <span class="service-item-price">10&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Pédicure">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Soin du visage</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Soin du visage">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Détox capillaire</span>
+                        <span class="service-item-price">5&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Détox capillaire">Réserver</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="service-card service-category">
+                <div class="service-card-head">
+                    <i class="fas fa-house"></i>
+                    <div>
+                        <h3>Coupe à domicile</h3>
+                        <p class="service-subtitle">Déplacement</p>
+                    </div>
+                </div>
+                <ul class="service-list">
+                    <li class="service-item">
+                        <span class="service-item-name">2 personnes ou plus</span>
+                        <span class="service-item-price">15&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe à domicile (2 personnes ou plus)">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">Solo</span>
+                        <span class="service-item-price">20&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe à domicile (solo)">Réserver</a>
+                    </li>
+                    <li class="service-item">
+                        <span class="service-item-name">2 coupes solo / mois</span>
+                        <span class="service-item-price">30&nbsp;000 FCFA</span>
+                        <a href="#reservation" class="btn-secondary btn-service" data-service="Coupe à domicile (2 coupes solo / mois)">Réserver</a>
+                    </li>
+                </ul>
             </div>
         </div>
+        <p class="services-note">Tous les tarifs sont en FCFA.</p>
     </section>
 
     <!-- Barbers Section -->
@@ -95,7 +334,7 @@
             <div class="barbers-grid">
                 <div class="barber-card">
                 <img src="assets/image/image.png" alt="Ahmed">
-                <h3>Ahmed</h3>
+                <h3>Cheikh</h3>
                 <p>Maître barbier - 10 ans d'expérience</p>
                 <div class="rating">
                     <i class="fas fa-star"></i>
@@ -143,22 +382,33 @@
                     <div id="clientLoggedOut">
                         <p class="account-hint">Simple : si l'email existe déjà, ça connecte. Sinon ça crée le compte.</p>
 
+                        <div class="auth-switch" role="tablist" aria-label="Choisir connexion ou création de compte">
+                            <button id="authModeLogin" class="auth-switch-btn active" type="button" data-mode="login"
+                                aria-selected="true">Connexion</button>
+                            <button id="authModeRegister" class="auth-switch-btn" type="button" data-mode="register"
+                                aria-selected="false">Créer un compte</button>
+                        </div>
+
                         <form id="clientAuthForm" class="account-form">
+                            <div id="registerFields" class="auth-register-fields" hidden>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="clientFirstName">Prénom *</label>
-                                    <input type="text" id="clientFirstName" required placeholder="Prénom">
+                                    <input type="text" id="clientFirstName" placeholder="Prénom">
                                 </div>
                                 <div class="form-group">
                                     <label for="clientLastName">Nom *</label>
-                                    <input type="text" id="clientLastName" required placeholder="Nom">
+                                    <input type="text" id="clientLastName" placeholder="Nom">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="clientPhone">Numéro de téléphone *</label>
-                                <input type="tel" id="clientPhone" required placeholder="06 12 34 56 78">
+                                <input type="tel" id="clientPhone" placeholder="77 000 00 00">
                             </div>
+
+                            </div>
+
 
                             <div class="form-group">
                                 <label for="clientEmail">Email *</label>
@@ -170,7 +420,7 @@
                                 <input type="password" id="clientPassword" required placeholder="Min 6 caractères">
                             </div>
 
-                            <button type="submit" class="btn-submit">
+                            <button type="submit" class="btn-submit" id="clientAuthSubmit">
                                 <i class="fas fa-user-check"></i>
                                 Continuer
                             </button>
@@ -193,9 +443,9 @@
 
                 <h3>Informations</h3>
                 <p><i class="fas fa-user"></i> Professionnel, passionnel</p>
-                <p><i class="fab fa-instagram"></i> @aumanoirdescheuveux</p>
+                <p><i class="fas fa-scissors"></i> @aumanoirdescheuveux</p>
                 <p><i class="fab fa-instagram"></i> sk_barberrr</p>
-                <p><i class="fab fa-instagram"></i> sk__barberr</p>
+                <p><i class="fab fa-snapchat"></i> sk__barberr</p>
                 <p><i class="fas fa-map-marker-alt"></i> Ngor Almadies, à côté de la graine d'or</p>
                 <p><i class="fas fa-phone"></i> Tel et Wtsp: 764077543</p>
                 <p><i class="fas fa-clock"></i> Lun-Sam: 9h - 20h</p>
@@ -226,7 +476,7 @@
 
                 <div class="form-group">
                     <label for="phone">Téléphone *</label>
-                    <input type="tel" id="phone" required placeholder="06 12 34 56 78">
+                    <input type="tel" id="phone" required placeholder="+221 77 000 00 00">
                 </div>
 
                 <div class="form-row">
@@ -234,10 +484,53 @@
                         <label for="service">Service *</label>
                         <select id="service" required>
                             <option value="">Choisir un service</option>
-                            <option value="Coupe Classique">Coupe Classique - 25€</option>
-                            <option value="Coupe + Barbe">Coupe + Barbe - 35€</option>
-                            <option value="Soin Visage">Soin Visage - 25€</option>
-                            <option value="Pack Prestige">Pack Prestige - 50€</option>
+                            <optgroup label="Coiffure">
+                                <option value="Contours">Contours — 2 000 FCFA</option>
+                                <option value="Coupe simple">Coupe simple — 4 000 FCFA</option>
+                                <option value="Coupe enfant">Coupe enfant — 4 000 FCFA</option>
+                                <option value="Taper fade">Taper fade — 6 000 FCFA</option>
+                                <option value="Dégradé">Dégradé — 6 000 FCFA</option>
+                                <option value="Coupe + wave">Coupe + wave — 8 000 FCFA</option>
+                                <option value="Coupe ciseaux">Coupe ciseaux — 10 000 FCFA</option>
+                                <option value="Coupe dame">Coupe dame — 10 000 FCFA</option>
+                            </optgroup>
+                            <optgroup label="Formules">
+                                <option value="Contours + barbe complète">Contours + barbe complète — 4 000 FCFA</option>
+                                <option value="Dégradé + détox + shampoing">Dégradé + détox + shampoing — 9 000 FCFA</option>
+                                <option value="Cône + détox + shampoing">Cône + détox + shampoing — 9 000 FCFA</option>
+                                <option value="Coupe + défrisage + shampoing">Coupe + défrisage + shampoing — 10 000 FCFA</option>
+                                <option value="Coupe + teinture blonde">Coupe + teinture blonde — 10 000 FCFA</option>
+                                <option value="Coupe + teinture (blanc et autres)">Coupe + teinture (blanc et autres) — 12 000 FCFA</option>
+                            </optgroup>
+                            <optgroup label="Locks & twist">
+                                <option value="Resserrage demi-tête">Resserrage demi-tête — 15 000 FCFA</option>
+                                <option value="Resserrage tête complète">Resserrage tête complète — 25 000 FCFA</option>
+                                <option value="Départ de locks">Départ de locks — 50 000 FCFA</option>
+                                <option value="Twist">Twist — 15 000 FCFA</option>
+                                <option value="Micro twist">Micro twist — 25 000 FCFA</option>
+                                <option value="Sister twist avec extension">Sister twist avec extension (à partir de) — 50 000 FCFA</option>
+                                <option value="Sister locks">Sister locks — 75 000 FCFA</option>
+                                <option value="Micro locks">Micro locks — 95 000 FCFA</option>
+                                <option value="Dream locks">Dream locks — 45 000 FCFA</option>
+                                <option value="Locks avec extension">Locks avec extension (à partir de) — 150 000 FCFA</option>
+                                <option value="Extension dread locks">Extension dread locks (à partir de) — 125 000 FCFA</option>
+                                <option value="Resserrage avec broderie">Resserrage avec broderie — 15 000 FCFA</option>
+                                <option value="Resserrage micro locks">Resserrage micro locks — 25 000 FCFA</option>
+                                <option value="Resserrage sister locks">Resserrage sister locks — 15 000 FCFA</option>
+                                <option value="Resserrage twist">Resserrage twist — 15 000 FCFA</option>
+                                <option value="Resserrage micro twist">Resserrage micro twist — 20 000 FCFA</option>
+                            </optgroup>
+                            <optgroup label="Soins">
+                                <option value="Manicure">Manicure — 7 000 FCFA</option>
+                                <option value="Pédicure">Pédicure — 10 000 FCFA</option>
+                                <option value="Soin du visage">Soin du visage — 15 000 FCFA</option>
+                                <option value="Détox capillaire">Détox capillaire — 5 000 FCFA</option>
+                            </optgroup>
+                            <optgroup label="Coupe à domicile">
+                                <option value="Coupe à domicile (2 personnes ou plus)">2 personnes ou plus — 15 000 FCFA</option>
+                                <option value="Coupe à domicile (solo)">Solo — 20 000 FCFA</option>
+                                <option value="Coupe à domicile (2 coupes solo / mois)">2 coupes solo / mois — 30 000 FCFA</option>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -319,7 +612,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>SK BARBER</h3>
+                <h3>MANOIR DES CHEVEUX</h3>
                 <p>Votre style, notre passion. Au service de votre élégance depuis 2010.</p>
             </div>
             <div class="footer-section">
@@ -338,7 +631,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 SK BARBER. Tous droits réservés.</p>
+            <p>&copy; 2024 MANOIR DES CHEVEUX. Tous droits réservés.</p>
         </div>
     </footer>
 
@@ -346,3 +639,4 @@
 </body>
 
 </html>
+

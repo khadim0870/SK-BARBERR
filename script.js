@@ -1,7 +1,17 @@
-(() => {
+﻿(() => {
   const TOKEN_KEY = "skbarber_client_token_v1";
   const USER_KEY = "skbarber_client_user_v1";
   const MY_BOOKINGS_SEEN_KEY = "skbarber_my_bookings_seen_v1";
+
+  const API_BASE = (() => {
+    const host = String(window.location.hostname || "").toLowerCase();
+    const isLocal = host === "localhost" || host === "127.0.0.1";
+    const port = String(window.location.port || "");
+    // If you opened the site with Live Server (often :5500), use the backend on :3000.
+    // Backend dev CORS is enabled for localhost origins.
+    if (isLocal && port && port !== "3000") return "http://localhost:3000";
+    return "";
+  })();
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -103,20 +113,35 @@
       if (token) headers.Authorization = `Bearer ${token}`;
     }
 
-    const res = await fetch(path, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    let res;
+    try {
+      res = await fetch(`${API_BASE}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch {
+      const error = new Error("network_error");
+      error.network = true;
+      throw error;
+    }
 
     const text = await res.text();
-    const data = text ? JSON.parse(text) : null;
+    let data = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = null;
+    }
+
     if (!res.ok) {
       const error = new Error("request_failed");
       error.status = res.status;
       error.data = data;
+      error.nonJson = Boolean(text && !data);
       throw error;
     }
+
     return data;
   };
 
@@ -297,39 +322,133 @@
       myBookingsListEl.appendChild(tr);
     }
   };
-
   const initClientAuth = () => {
     if (!clientAuthForm) return;
+
+    const authModeLoginBtn = $("#authModeLogin");
+    const authModeRegisterBtn = $("#authModeRegister");
+    const registerFieldsEl = $("#registerFields");
+    const submitBtn = $("#clientAuthSubmit");
+
+    let authMode = "login";
+
+    const setModeUi = (mode) => {
+      authMode = mode === "register" ? "register" : "login";
+      const isRegister = authMode === "register";
+
+      authModeLoginBtn?.classList.toggle("active", !isRegister);
+      authModeLoginBtn?.setAttribute("aria-selected", String(!isRegister));
+      authModeRegisterBtn?.classList.toggle("active", isRegister);
+      authModeRegisterBtn?.setAttribute("aria-selected", String(isRegister));
+
+      if (registerFieldsEl) registerFieldsEl.hidden = !isRegister;
+
+      const toggleField = (el) => {
+        if (!el) return;
+        el.disabled = !isRegister;
+        el.required = isRegister;
+        if (!isRegister) el.value = "";
+      };
+
+      toggleField(clientFirstNameEl);
+      toggleField(clientLastNameEl);
+      toggleField(clientPhoneEl);
+
+      if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-user-check"></i> Continuer';
+      }
+    };
+
+    authModeLoginBtn?.addEventListener("click", () => {
+      setAuthMessage("", "");
+      setModeUi("login");
+    });
+
+    authModeRegisterBtn?.addEventListener("click", () => {
+      setAuthMessage("", "");
+      setModeUi("register");
+    });
+
+    // Default: simple login (email + mot de passe)
+    setModeUi("login");
 
     clientAuthForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       setAuthMessage("", "");
 
-      const firstName = String(clientFirstNameEl?.value || "").trim();
-      const lastName = String(clientLastNameEl?.value || "").trim();
-      const phone = normalizePhone(clientPhoneEl?.value || "");
       const email = String(clientEmailEl?.value || "").trim().toLowerCase();
       const password = String(clientPasswordEl?.value || "");
 
-      if (!firstName || !lastName || !phone || !email || !password) {
-        setAuthMessage("error", "Merci de remplir tous les champs.");
-        return;
+      if (authMode === "login") {
+        if (!email || !password) {
+          setAuthMessage("error", "Merci de remplir email et mot de passe.");
+          return;
+        }
+      } else {
+        const firstName = String(clientFirstNameEl?.value || "").trim();
+        const lastName = String(clientLastNameEl?.value || "").trim();
+        const phone = normalizePhone(clientPhoneEl?.value || "");
+
+        if (!firstName || !lastName || !phone || !email || !password) {
+          setAuthMessage("error", "Merci de remplir tous les champs.");
+          return;
+        }
       }
 
       try {
-        const data = await apiFetch("/api/auth/continue", {
+        const firstName = String(clientFirstNameEl?.value || "").trim();
+        const lastName = String(clientLastNameEl?.value || "").trim();
+        const phone = normalizePhone(clientPhoneEl?.value || "");
+
+        const data = await apiFetch(authMode === "register" ? "/api/auth/register" : "/api/auth/login", {
           method: "POST",
-          body: { firstName, lastName, phone, email, password },
+          body:
+            authMode === "register"
+              ? { firstName, lastName, phone, email, password }
+              : { email, password },
         });
+
         setToken(data.token);
         setUser(data.user);
-        setAuthMessage("success", data.mode === "register" ? "Compte créé." : "Connexion réussie.");
+        setAuthMessage("success", authMode === "register" ? "Compte créé." : "Connexion réussie.");
         await renderClientState();
       } catch (err) {
+        if (err?.network) {
+          setAuthMessage(
+            "error",
+            "Serveur introuvable. Lance `npm start` (dossier `server`) et ouvre le site via http://localhost:3000/."
+          );
+          return;
+        }
+
+        const host = String(window.location.hostname || "").toLowerCase();
+        const isLocal = host === "localhost" || host === "127.0.0.1";
+        const port = String(window.location.port || "");
+        if (isLocal && port && port !== "3000" && (err?.nonJson || err?.status === 404)) {
+          setAuthMessage("error", "Tu as ouvert le site avec Live Server. Ouvre plutôt http://localhost:3000/.");
+          return;
+        }
+
+        if (err?.nonJson || err?.status === 404) {
+          setAuthMessage(
+            "error",
+            "API introuvable. Redémarre le serveur (`cd server` puis `npm start`) et ouvre http://localhost:3000/."
+          );
+          console.error("Auth failed (non-json or 404):", err);
+          return;
+        }
+
         const code = err?.data?.error;
-        if (code === "invalid_credentials") setAuthMessage("error", "Mot de passe incorrect.");
+        if (code === "invalid_credentials") setAuthMessage("error", "Email ou mot de passe incorrect.");
+        else if (code === "email_exists") setAuthMessage("error", "Cet email existe déjà. Connecte-toi.");
         else if (code === "weak_password") setAuthMessage("error", "Mot de passe trop court (min 6).");
-        else setAuthMessage("error", "Impossible de se connecter.");
+        else if (code === "not_a_client") setAuthMessage("error", "Ce compte n'est pas autorisé ici.");
+        else if (err?.status >= 500)
+          setAuthMessage("error", "Erreur serveur. Vérifie que le backend tourne et que DATABASE_URL est correct.");
+        else {
+          setAuthMessage("error", "Impossible de se connecter.");
+          console.error("Auth failed:", err);
+        }
       }
     });
 
@@ -348,7 +467,6 @@
       await renderClientState();
     });
   };
-
   const initForm = () => {
     if (dateEl) {
       const today = toLocalISODate();
@@ -476,12 +594,213 @@
     }, 15000);
   };
 
+  const initVideos = async () => {
+    const videoGrid = $("#videoGrid");
+    const section = $("section.videos");
+    if (!section) return;
+
+    const targetRate = 1.25;
+    const tryPlay = (v) => {
+      try {
+        const p = v.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch {
+        // ignore autoplay restrictions
+      }
+    };
+
+    const applyVideoDefaults = (v) => {
+      v.muted = true;
+      v.defaultMuted = true;
+      v.volume = 0;
+      v.autoplay = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.defaultPlaybackRate = targetRate;
+      v.playbackRate = targetRate;
+
+      v.addEventListener("play", () => {
+        v.muted = true;
+        v.volume = 0;
+        v.playbackRate = targetRate;
+      });
+    };
+
+    const resolveAssetPath = (item) => {
+      if (item.path) return String(item.path);
+      const src = String(item.src || "");
+      if (src.startsWith("assets/")) return src;
+      if (src.includes("/")) return `assets/${src}`;
+      return `assets/videos/${src}`;
+    };
+
+    const inferKind = (item) => {
+      const kind = String(item.kind || "").toLowerCase();
+      if (kind === "image" || kind === "video") return kind;
+      const p = resolveAssetPath(item).toLowerCase();
+      if (p.endsWith(".mp4") || p.endsWith(".webm")) return "video";
+      return "image";
+    };
+
+    const makeCard = (item) => {
+      const srcPath = resolveAssetPath(item);
+      const caption = String(item.caption || item.src || "").trim();
+      const kind = inferKind(item);
+
+      const card = document.createElement("div");
+      card.className = "video-card";
+
+      let video = null;
+      if (kind === "video") {
+        video = document.createElement("video");
+        video.controls = true;
+        video.muted = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.setAttribute("playsinline", "");
+        video.preload = "metadata";
+        video.poster = "assets/image/video-poster.svg";
+
+        const source = document.createElement("source");
+        source.src = srcPath;
+        source.type = srcPath.toLowerCase().endsWith(".webm") ? "video/webm" : "video/mp4";
+        video.appendChild(source);
+
+        applyVideoDefaults(video);
+      } else {
+        const img = document.createElement("img");
+        img.className = "media-img";
+        img.src = srcPath;
+        img.alt = caption || "Galerie";
+        img.loading = "lazy";
+        card.appendChild(img);
+      }
+
+      const p = document.createElement("p");
+      p.className = "video-caption";
+      p.textContent = caption || (kind === "image" ? "Galerie" : "Vidéo");
+
+      if (video) card.append(video, p);
+      else card.append(p);
+
+      return { card, video };
+    };
+
+    const normalizeManifest = (data) => {
+      if (!Array.isArray(data)) return [];
+      return data
+        .map((item) => {
+          if (typeof item === "string") return { src: item, caption: "" };
+          if (!item || typeof item !== "object") return null;
+          const src = String(item.src || "").trim();
+          const path = String(item.path || "").trim();
+          const kind = String(item.kind || "").trim();
+          const caption = String(item.caption || "").trim();
+
+          // Accept either {src: "..."} (video) or {path: "...", kind:"image"} (image)
+          if (!src && !path) return null;
+          return { ...item, src, path, kind, caption };
+        })
+        .filter(Boolean);
+    };
+
+    let videos = [];
+    if (videoGrid) {
+      try {
+        const manifest = await apiFetch("/assets/videos/manifest.json");
+        const items = normalizeManifest(manifest);
+        const galleryItems = items.filter((item) => {
+          if (inferKind(item) !== "video") return false;
+          const p = resolveAssetPath(item).toLowerCase();
+          // Keep wa-014 only for the homepage hero (not inside the gallery grid)
+          return !p.endsWith("/wa-014.mp4");
+        });
+
+        videoGrid.innerHTML = "";
+        const created = galleryItems.map(makeCard);
+        created.forEach(({ card }) => videoGrid.appendChild(card));
+        videos = created.map(({ video }) => video).filter(Boolean);
+      } catch {
+        // Fallback: keep any existing markup
+        videos = $$("section.videos video");
+        videos.forEach(applyVideoDefaults);
+      }
+    } else {
+      videos = $$("section.videos video");
+      videos.forEach(applyVideoDefaults);
+    }
+
+    if (!videos.length) return;
+
+    // Autoplay only what is visible to reduce CPU on lots of videos
+    const io =
+      "IntersectionObserver" in window
+        ? new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                const v = entry.target;
+                if (entry.isIntersecting) tryPlay(v);
+                else v.pause();
+              }
+            },
+            { threshold: 0.25 }
+          )
+        : null;
+
+    for (const v of videos) {
+      v.addEventListener("loadeddata", () => tryPlay(v));
+      v.addEventListener("canplay", () => tryPlay(v));
+      if (io) io.observe(v);
+      tryPlay(v);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible") return;
+      for (const v of videos) tryPlay(v);
+    });
+  };
+
+  const initHeroVideo = () => {
+    const v = $(".hero-bg-video");
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.volume = 0;
+    v.loop = true;
+    v.playsInline = true;
+
+    const tryPlay = () => {
+      try {
+        const p = v.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch {
+        // ignore autoplay restrictions
+      }
+    };
+
+    apiFetch("/api/public/settings")
+      .then((data) => {
+        const src = String(data?.heroVideoSrc || "").trim();
+        if (!src) return;
+        v.src = `assets/videos/${src}`;
+        v.load();
+        tryPlay();
+      })
+      .catch(() => {});
+
+    v.addEventListener("loadeddata", tryPlay);
+    v.addEventListener("canplay", tryPlay);
+    tryPlay();
+  };
+
   const init = async () => {
     initHamburgerMenu();
     initClientAuth();
     initForm();
     initQuickReserveFromServices();
     initMyBookings();
+    await initVideos();
+    initHeroVideo();
     await renderClientState();
   };
 

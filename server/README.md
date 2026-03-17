@@ -1,11 +1,13 @@
-# SK BARBER (Option 2) — Backend Node/Express
+# MANOIR DES CHEVEUX (Option 2) — Backend Node/Express
 
 ## Démarrage
 
 1. Va dans le dossier serveur :
    - `cd server`
 2. Crée ton fichier d'environnement :
-   - copie `server/.env.example` vers `server/.env` et change au minimum `JWT_SECRET` + `ADMIN_PASSWORD` + `DATABASE_URL`
+   - soit copie `server/.env.example` vers `server/.env`
+   - soit remplis directement `server/.env.example`
+   - change au minimum `JWT_SECRET` + `ADMIN_PASSWORD` + `DATABASE_URL`
 3. Installe les dépendances :
    - `npm install`
 4. Lance le serveur :

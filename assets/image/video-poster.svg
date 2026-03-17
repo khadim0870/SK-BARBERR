@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0f19"/>
+      <stop offset="0.55" stop-color="#2a1230"/>
+      <stop offset="1" stop-color="#0b0f19"/>
+    </linearGradient>
+    <radialGradient id="r1" cx="20%" cy="10%" r="70%">
+      <stop offset="0" stop-color="#CA3C66" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#CA3C66" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="r2" cx="85%" cy="15%" r="70%">
+      <stop offset="0" stop-color="#4AA3A2" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#4AA3A2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#g)"/>
+  <rect width="1280" height="720" fill="url(#r1)"/>
+  <rect width="1280" height="720" fill="url(#r2)"/>
+
+  <g fill="#ffffff" opacity="0.92" font-family="Oswald, Poppins, Arial, sans-serif" text-anchor="middle">
+    <text x="640" y="330" font-size="62" letter-spacing="4">MANOIR DES</text>
+    <text x="640" y="405" font-size="84" letter-spacing="4">CHEVEUX</text>
+    <text x="640" y="460" font-size="24" opacity="0.8" letter-spacing="2">VIDEO</text>
+  </g>
+
+  <g transform="translate(640 480)" opacity="0.88">
+    <circle r="54" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.28)" stroke-width="3"/>
+    <path d="M-14 -20 L34 0 L-14 20 Z" fill="#ffffff"/>
+  </g>
+</svg>

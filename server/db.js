@@ -3,7 +3,32 @@ const { Pool } = require("pg");
 const createPool = () => {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error("Missing DATABASE_URL");
+    throw new Error(
+      "Missing DATABASE_URL. Crée `server/.env` (ou remplis `server/.env.example`) et ajoute une ligne DATABASE_URL=postgres://..."
+    );
+  }
+
+  // Give a clearer error for a very common misconfiguration:
+  // - local Postgres requires a password (especially with SCRAM auth)
+  // - if the URL omits it, `pg` will crash with: "client password must be a string"
+  try {
+    const u = new URL(connectionString);
+    const isPostgres = u.protocol === "postgres:" || u.protocol === "postgresql:";
+    if (isPostgres) {
+      const hasUser = Boolean(u.username);
+      const hasPassword = u.password !== "";
+      if (hasUser && !hasPassword) {
+        throw new Error(
+          "DATABASE_URL sans mot de passe. Exemple: postgres://postgres:TON_MDP@127.0.0.1:5432/skbarber (mets 127.0.0.1 pour éviter ::1)."
+        );
+      }
+    }
+  } catch (err) {
+    if (err instanceof Error && String(err.message || "").startsWith("DATABASE_URL")) throw err;
+    // If URL parsing fails (special chars in password not URL-encoded, etc.), still show a helpful hint.
+    throw new Error(
+      "DATABASE_URL invalide. Si ton mot de passe contient des caractères spéciaux (@ : / ? #), encode-le (ex: %40 pour @)."
+    );
   }
 
   const shouldUseSsl =
@@ -30,6 +55,14 @@ const initSchema = async (pool) => {
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'client',
       created_at TIMESTAMPTZ NOT NULL
+    );
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL
     );
   `);
 
@@ -64,4 +97,3 @@ const initSchema = async (pool) => {
 };
 
 module.exports = { createPool, initSchema };
-

@@ -1,4 +1,5 @@
 const path = require("node:path");
+const fs = require("node:fs");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -6,14 +7,60 @@ const dotenv = require("dotenv");
 const { createPool, initSchema } = require("./db");
 const { randomId, nowIso, hashPassword, verifyPassword } = require("./security");
 
-dotenv.config();
+// Load env from `server/.env` if present, otherwise fall back to `server/.env.example`
+// (useful in local dev when the user only has `.env.example`).
+const envPath = fs.existsSync(path.join(__dirname, ".env"))
+  ? path.join(__dirname, ".env")
+  : path.join(__dirname, ".env.example");
+dotenv.config({ path: envPath });
 
 const PORT = Number(process.env.PORT || 3000);
 const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret";
 const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || "admin@skbarber.local").toLowerCase();
 const ADMIN_PASSWORD = String(process.env.ADMIN_PASSWORD || "ChangeMe123!");
+const IS_PROD = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER);
+
+// Serve frontend from project root (avoid file:// issues)
+const projectRoot = path.join(__dirname, "..");
 
 const pool = createPool();
+
+const latestHeroVideoFromAssets = () => {
+  try {
+    const dir = path.join(projectRoot, "assets", "videos");
+    const names = fs.readdirSync(dir, { withFileTypes: true });
+    const matches = [];
+    for (const e of names) {
+      if (!e.isFile()) continue;
+      const m = /^wa-(\d{3})\.mp4$/i.exec(e.name);
+      if (m) matches.push({ n: Number(m[1]), name: e.name });
+    }
+    if (matches.length) {
+      matches.sort((a, b) => a.n - b.n);
+      return matches[matches.length - 1].name;
+    }
+  } catch {
+    // ignore
+  }
+  return "wa-001.mp4";
+};
+
+const ensureDefaultSettings = async () => {
+  const updatedAt = nowIso();
+  const latest = latestHeroVideoFromAssets();
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ($1,$2,$3)
+     ON CONFLICT (key) DO NOTHING`,
+    ["heroVideoSrc", latest, updatedAt]
+  );
+
+  // If still on old placeholder, update to latest clip (doesn't overwrite custom admin choice)
+  await pool.query(
+    "UPDATE settings SET value = $1, updated_at = $2 WHERE key = $3 AND value = $4",
+    [latest, updatedAt, "heroVideoSrc", "wa-001.mp4"]
+  );
+};
 
 const ensureAdminUser = async () => {
   const existing = await pool.query(
@@ -54,6 +101,31 @@ const ensureAdminUser = async () => {
 const app = express();
 app.use(express.json({ limit: "256kb" }));
 
+// Dev CORS: allow calls from Live Server (localhost/127.0.0.1) to the API on :3000
+if (!IS_PROD) {
+  app.use((req, res, next) => {
+    const origin = String(req.headers.origin || "");
+    const allowed = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+    if (allowed) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+      res.setHeader("Vary", "Origin");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+    }
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    return next();
+  });
+}
+
+app.get("/api/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    return res.json({ ok: true, db: true, time: nowIso() });
+  } catch (err) {
+    return res.status(500).json({ ok: false, db: false, time: nowIso() });
+  }
+});
+
 const signToken = (user) =>
   jwt.sign({ sub: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
 
@@ -76,8 +148,6 @@ const adminRequired = (req, res, next) => {
   return next();
 };
 
-// Serve frontend from project root (avoid file:// issues)
-const projectRoot = path.join(__dirname, "..");
 app.use("/assets", express.static(path.join(projectRoot, "assets")));
 app.get("/", (req, res) => res.sendFile(path.join(projectRoot, "index.html")));
 app.get("/index.html", (req, res) => res.sendFile(path.join(projectRoot, "index.html")));
@@ -87,10 +157,63 @@ app.get("/style.css", (req, res) => res.sendFile(path.join(projectRoot, "style.c
 app.get("/script.js", (req, res) => res.sendFile(path.join(projectRoot, "script.js")));
 app.get("/admin.js", (req, res) => res.sendFile(path.join(projectRoot, "admin.js")));
 
-app.get("/api/health", (req, res) => res.json({ ok: true }));
+// Public settings (no auth)
+app.get("/api/public/settings", async (req, res) => {
+  const row = await pool.query("SELECT value FROM settings WHERE key = $1 LIMIT 1", ["heroVideoSrc"]);
+  const heroVideoSrc = row.rows[0]?.value || "wa-001.mp4";
+  return res.json({ heroVideoSrc });
+});
 
-// Auth: single "continue" endpoint (register if new, else login)
-app.post("/api/auth/continue", async (req, res) => {
+// Admin settings
+app.patch("/api/admin/settings/hero-video", authRequired, adminRequired, async (req, res) => {
+  const src = String(req.body?.src || "").trim();
+  if (!src || !src.toLowerCase().endsWith(".mp4")) {
+    return res.status(400).json({ error: "invalid_src" });
+  }
+
+  await pool.query(
+    `INSERT INTO settings (key, value, updated_at)
+     VALUES ($1,$2,$3)
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at`,
+    ["heroVideoSrc", src, nowIso()]
+  );
+
+  return res.json({ ok: true });
+});
+
+const getUserByEmail = async (email) => {
+  const row = await pool.query(
+    "SELECT id, name, email, phone, password_hash, role FROM users WHERE email = $1 LIMIT 1",
+    [email]
+  );
+  return row.rows[0] || null;
+};
+
+const respondClientAuth = (res, user, mode) => {
+  const token = signToken(user);
+  return res.json({
+    token,
+    user: { id: user.id, name: user.name, email: user.email, phone: user.phone },
+    mode,
+  });
+};
+
+// Client login: email + mot de passe
+app.post("/api/auth/login", async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  const password = String(req.body?.password || "");
+  if (!email || !password) return res.status(400).json({ error: "missing_fields" });
+
+  const user = await getUserByEmail(email);
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: "invalid_credentials" });
+  }
+  if (user.role !== "client") return res.status(403).json({ error: "not_a_client" });
+  return respondClientAuth(res, user, "login");
+});
+
+// Client register: infos + mot de passe
+app.post("/api/auth/register", async (req, res) => {
   const firstName = String(req.body?.firstName || "").trim();
   const lastName = String(req.body?.lastName || "").trim();
   const phone = String(req.body?.phone || "").trim();
@@ -102,12 +225,51 @@ app.post("/api/auth/continue", async (req, res) => {
   }
   if (password.length < 6) return res.status(400).json({ error: "weak_password" });
 
-  const existing = await pool.query(
-    "SELECT id, name, email, phone, password_hash, role FROM users WHERE email = $1 LIMIT 1",
-    [email]
-  );
-  const existingUser = existing.rows[0];
+  const existing = await getUserByEmail(email);
+  if (existing) return res.status(409).json({ error: "email_exists" });
 
+  const user = {
+    id: randomId(),
+    first_name: firstName,
+    last_name: lastName,
+    name: `${firstName} ${lastName}`.trim(),
+    email,
+    phone,
+    password_hash: hashPassword(password),
+    role: "client",
+    created_at: nowIso(),
+  };
+
+  await pool.query(
+    `INSERT INTO users (id, first_name, last_name, name, email, phone, password_hash, role, created_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+    [
+      user.id,
+      user.first_name,
+      user.last_name,
+      user.name,
+      user.email,
+      user.phone,
+      user.password_hash,
+      user.role,
+      user.created_at,
+    ]
+  );
+
+  return respondClientAuth(res, user, "register");
+});
+
+// Auth: legacy "continue" endpoint (login with email+password, register if new)
+app.post("/api/auth/continue", async (req, res) => {
+  const firstName = String(req.body?.firstName || "").trim();
+  const lastName = String(req.body?.lastName || "").trim();
+  const phone = String(req.body?.phone || "").trim();
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  const password = String(req.body?.password || "");
+
+  if (!email || !password) return res.status(400).json({ error: "missing_fields" });
+
+  const existingUser = await getUserByEmail(email);
   if (existingUser) {
     if (!verifyPassword(password, existingUser.password_hash)) {
       return res.status(401).json({ error: "invalid_credentials" });
@@ -115,18 +277,14 @@ app.post("/api/auth/continue", async (req, res) => {
     if (existingUser.role !== "client") {
       return res.status(403).json({ error: "not_a_client" });
     }
-    const token = signToken(existingUser);
-    return res.json({
-      token,
-      user: {
-        id: existingUser.id,
-        name: existingUser.name,
-        email: existingUser.email,
-        phone: existingUser.phone,
-      },
-      mode: "login",
-    });
+    return respondClientAuth(res, existingUser, "login");
   }
+
+  // New account creation requires extra fields
+  if (!firstName || !lastName || !phone) {
+    return res.status(400).json({ error: "missing_fields" });
+  }
+  if (password.length < 6) return res.status(400).json({ error: "weak_password" });
 
   const user = {
     id: randomId(),
@@ -160,12 +318,7 @@ app.post("/api/auth/continue", async (req, res) => {
     return res.status(409).json({ error: "email_exists" });
   }
 
-  const token = signToken(user);
-  return res.json({
-    token,
-    user: { id: user.id, name: user.name, email: user.email, phone: user.phone },
-    mode: "register",
-  });
+  return respondClientAuth(res, user, "register");
 });
 
 // Admin login
@@ -320,11 +473,12 @@ app.delete("/api/admin/bookings/:id", authRequired, adminRequired, async (req, r
 
 const start = async () => {
   await initSchema(pool);
+  await ensureDefaultSettings();
   await ensureAdminUser();
 
   app.listen(PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`SK BARBER server running on http://localhost:${PORT}`);
+    console.log(`MANOIR DES CHEVEUX server running on http://localhost:${PORT}`);
     // eslint-disable-next-line no-console
     console.log(`Admin: ${ADMIN_EMAIL} (set in server/.env)`);
   });
