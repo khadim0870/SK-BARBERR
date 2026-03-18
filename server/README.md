@@ -17,6 +17,8 @@ Puis ouvre :
 
 - Site : `http://localhost:3000/`
 - Admin : `http://localhost:3000/admin.html`
+- Health (light) : `http://localhost:3000/healthz`
+- Health (DB) : `http://localhost:3000/api/health`
 
 ## Notes
 

@@ -117,6 +117,9 @@ if (!IS_PROD) {
   });
 }
 
+// Lightweight healthcheck (no DB) for uptime monitors
+app.get("/healthz", (req, res) => res.status(200).send("ok"));
+
 app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
