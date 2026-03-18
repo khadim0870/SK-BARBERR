@@ -588,6 +588,10 @@ section {
   position: relative;
 }
 
+.video-grid .video-caption {
+  display: none !important;
+}
+
 
 .video-card video {
   width: 100%;
@@ -800,8 +804,8 @@ section {
 }
 
 .service-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.75rem;
   padding: 0.75rem 0.8rem;
@@ -811,22 +815,26 @@ section {
 }
 
 .service-item-name {
+  flex: 1 1 180px;
   font-weight: 600;
 }
 
 .service-item-price {
+  flex: 0 0 auto;
   color: var(--primary);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .service-item .btn-service {
+  flex: 0 0 auto;
   margin: 0;
   width: auto;
   max-width: none;
   padding: 0.55rem 0.85rem;
   font-size: 0.95rem;
   border-radius: 999px;
+  margin-left: auto;
 }
 
 .services-note {
@@ -1465,14 +1473,11 @@ tr:hover {
 }
 
 @media (max-width: 480px) {
-  .service-item {
-    grid-template-columns: 1fr auto;
-  }
-
   .service-item .btn-service {
-    grid-column: 1 / -1;
+    flex: 1 1 100%;
     width: 100%;
     justify-content: center;
+    margin-left: 0;
   }
 
   .logo {
